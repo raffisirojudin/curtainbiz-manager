@@ -1,0 +1,2406 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>CurtainBiz Manager — Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@400;500;600&display=swap");
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Jost", Arial, sans-serif;
+        background: #f7f4ee;
+        color: #1c2b35;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #c4973a55;
+        border-radius: 4px;
+      }
+
+      /* DEMO BANNER */
+      .demo-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #c4973a;
+        color: #fff;
+        text-align: center;
+        padding: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 99999;
+        letter-spacing: 0.5px;
+      }
+      .demo-banner span {
+        opacity: 0.85;
+        font-weight: 400;
+        margin-left: 6px;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 220px;
+        min-width: 220px;
+        height: 100vh;
+        background: #1a3528;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        flex-shrink: 0;
+        margin-top: 34px;
+      }
+      .brand {
+        padding: 22px 18px 16px;
+        border-bottom: 1px solid #ffffff18;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-icon {
+        font-size: 22px;
+      }
+      .brand-name {
+        font-size: 19px;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+        font-family: "Cormorant Garamond", serif;
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: #c4973a;
+        margin-top: 2px;
+      }
+      .sidenav {
+        flex: 1;
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .nav-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 13px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: transparent;
+        color: #9fc0b0;
+        font-size: 13px;
+        font-family: inherit;
+        text-align: left;
+        transition: all 0.15s;
+      }
+      .nav-btn:hover {
+        background: #264d3a;
+        color: #fff;
+      }
+      .nav-btn.active {
+        background: rgba(196, 151, 58, 0.25);
+        color: #c4973a;
+        font-weight: 600;
+      }
+      .nav-btn .ni {
+        font-size: 16px;
+      }
+      .nbadge {
+        margin-left: auto;
+        background: #c0392b;
+        color: #fff;
+        border-radius: 10px;
+        font-size: 11px;
+        padding: 1px 7px;
+        font-weight: 700;
+        display: none;
+      }
+      .nbadge.show {
+        display: inline-block;
+      }
+      .side-foot {
+        padding: 10px 12px 18px;
+      }
+      .side-note {
+        background: #ffffff12;
+        border-radius: 9px;
+        padding: 10px 12px;
+        font-size: 11px;
+        color: #9fc0b0;
+        line-height: 1.5;
+      }
+
+      /* MAIN */
+      .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px 32px;
+        min-width: 0;
+        margin-top: 34px;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .ph {
+        margin-bottom: 22px;
+      }
+      .ph h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .ph p {
+        font-size: 13px;
+        color: #7a8b96;
+        margin-top: 3px;
+      }
+      .ph-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      /* KPI */
+      .kgrid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .kcard {
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px 20px;
+        border: 1px solid #e5ddd0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .klabel {
+        font-size: 11px;
+        color: #7a8b96;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .kval {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .ksub {
+        font-size: 11px;
+        color: #7a8b96;
+        margin-top: 4px;
+      }
+      .kicon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      /* CARD */
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e5ddd0;
+        margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .chart-wrap {
+        position: relative;
+        height: 200px;
+        width: 100%;
+      }
+      .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .g3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+
+      /* ALERT */
+      .alert {
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .alert.warn {
+        background: #fef5e7;
+        border: 1px solid rgba(230, 126, 34, 0.3);
+      }
+      .alert.danger {
+        background: #fdedec;
+        border: 1px solid rgba(192, 57, 43, 0.3);
+      }
+      .alert-icon {
+        font-size: 18px;
+        margin-top: 1px;
+      }
+      .alert-title {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      .alert.warn .alert-title {
+        color: #e67e22;
+      }
+      .alert.danger .alert-title {
+        color: #c0392b;
+      }
+      .alert-body {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      /* BADGE */
+      .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .b-baru {
+        background: #ebf5fb;
+        color: #2471a3;
+      }
+      .b-diproses {
+        background: #fef5e7;
+        color: #e67e22;
+      }
+      .b-dijahit {
+        background: #f0ebff;
+        color: #7b3fe4;
+      }
+      .b-siap {
+        background: #e0f4ff;
+        color: #0a84c0;
+      }
+      .b-selesai {
+        background: #eafaf1;
+        color: #27ae60;
+      }
+      .b-batal {
+        background: #fdedec;
+        color: #c0392b;
+      }
+      .b-masuk {
+        background: #eafaf1;
+        color: #27ae60;
+      }
+      .b-keluar {
+        background: #fdedec;
+        color: #c0392b;
+      }
+      .b-aman {
+        background: #eafaf1;
+        color: #27ae60;
+      }
+      .b-tipis {
+        background: #fdedec;
+        color: #c0392b;
+      }
+
+      /* TABLE */
+      .dtable {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .dtable th {
+        text-align: left;
+        padding: 10px 13px;
+        font-size: 11px;
+        color: #7a8b96;
+        font-weight: 600;
+        background: #f7f4ee;
+        border-bottom: 2px solid #e5ddd0;
+      }
+      .dtable td {
+        padding: 11px 13px;
+        border-bottom: 1px solid #e5ddd0;
+        vertical-align: middle;
+      }
+      .dtable tr:last-child td {
+        border-bottom: none;
+      }
+      .dtable tr:hover td {
+        background: #faf8f4;
+      }
+      .tc {
+        font-weight: 700;
+        color: #c4973a;
+      }
+      .tm {
+        font-weight: 500;
+      }
+      .tx {
+        color: #7a8b96;
+        font-size: 12px;
+      }
+      .tok {
+        color: #27ae60;
+        font-weight: 700;
+      }
+      .terr {
+        color: #c0392b;
+        font-weight: 700;
+      }
+
+      /* FILTER */
+      .fbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .sinput {
+        padding: 9px 14px;
+        border-radius: 9px;
+        border: 1px solid #e5ddd0;
+        font-size: 13px;
+        background: #fff;
+        outline: none;
+        font-family: inherit;
+        flex: 1;
+        min-width: 200px;
+      }
+      .sfilters {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      .fbtn {
+        padding: 6px 12px;
+        border-radius: 9px;
+        border: 1px solid #e5ddd0;
+        cursor: pointer;
+        font-size: 12px;
+        background: #fff;
+        color: #7a8b96;
+        font-family: inherit;
+        transition: all 0.15s;
+      }
+      .fbtn.active {
+        background: #1a3528;
+        color: #fff;
+        border-color: #1a3528;
+      }
+
+      /* TAB */
+      .tbar {
+        display: flex;
+        border-bottom: 2px solid #e5ddd0;
+        margin-bottom: 18px;
+      }
+      .tbtn {
+        padding: 9px 18px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 400;
+        color: #7a8b96;
+        font-family: inherit;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.15s;
+      }
+      .tbtn.active {
+        color: #c4973a;
+        font-weight: 600;
+        border-bottom-color: #c4973a;
+      }
+      .tcontent {
+        display: none;
+      }
+      .tcontent.active {
+        display: block;
+      }
+      .ssel {
+        padding: 4px 8px;
+        border-radius: 7px;
+        border: 1px solid #e5ddd0;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      /* BUTTONS */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 9px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: inherit;
+        transition: opacity 0.15s;
+      }
+      .btn:hover {
+        opacity: 0.85;
+      }
+      .btn-p {
+        background: #1a3528;
+        color: #fff;
+      }
+      .btn-g {
+        background: transparent;
+        color: #1c2b35;
+        border: 1px solid #e5ddd0;
+      }
+
+      /* FORMS */
+      .fgroup {
+        margin-bottom: 13px;
+      }
+      .fgroup label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+      .fgroup input,
+      .fgroup select {
+        width: 100%;
+        padding: 9px 12px;
+        border-radius: 9px;
+        border: 1px solid #e5ddd0;
+        font-size: 13px;
+        background: #f7f4ee;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s;
+      }
+      .fgroup input:focus,
+      .fgroup select:focus {
+        border-color: #c4973a;
+      }
+
+      /* MODAL */
+      .moverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 998;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .moverlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 18px;
+        padding: 26px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 88vh;
+        overflow-y: auto;
+      }
+      .mhead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .mhead h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .mhead button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: #7a8b96;
+      }
+      .mfoot {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 10px;
+      }
+
+      /* CUSTOMER */
+      .cgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .ccard {
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px;
+        border: 1px solid #e5ddd0;
+      }
+      .ctop {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      .cavatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #1a3528;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        font-weight: 600;
+      }
+      .cname {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .cinfo {
+        font-size: 12px;
+        color: #7a8b96;
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+      .cstats {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #e5ddd0;
+        padding-top: 12px;
+      }
+      .csv {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .csva {
+        font-size: 16px;
+        font-weight: 700;
+        color: #c4973a;
+      }
+      .csl {
+        font-size: 11px;
+        color: #7a8b96;
+      }
+
+      /* INV */
+      .icat-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #7a8b96;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        margin-top: 18px;
+      }
+
+      /* HPP */
+      .hbox {
+        background: #f7f4ee;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 14px;
+      }
+      .hlabel {
+        font-size: 12px;
+        color: #7a8b96;
+        margin-bottom: 4px;
+      }
+      .hval {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .hcard {
+        background: #fdf4e0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hml {
+        font-size: 12px;
+        color: #7a8b96;
+      }
+      .hmv {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #c4973a;
+      }
+      .htag {
+        background: #c4973a;
+        color: #fff;
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+      }
+
+      /* LR */
+      .lrrow {
+        display: flex;
+        justify-content: space-between;
+        padding: 11px 0;
+        border-bottom: 1px solid #e5ddd0;
+        font-size: 13px;
+      }
+      .lrtotal {
+        border-top: 2px solid #e5ddd0;
+        border-bottom: none !important;
+        font-size: 16px;
+        font-weight: 700;
+        padding-top: 14px !important;
+        margin-top: 4px;
+      }
+
+      /* STOCK */
+      .sacts {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .sbtn {
+        border: none;
+        padding: 3px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .sbtn.p {
+        background: #eafaf1;
+        color: #27ae60;
+      }
+      .sbtn.m {
+        background: #fdedec;
+        color: #c0392b;
+      }
+      .sbtn.d {
+        background: none;
+      }
+      .empty {
+        text-align: center;
+        padding: 36px;
+        color: #7a8b96;
+        font-size: 13px;
+      }
+      .seg-vip {
+        color: #c4973a;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .seg-reg {
+        color: #2471a3;
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .seg-new {
+        color: #7a8b96;
+        font-size: 12px;
+      }
+      .sarow {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- DEMO BANNER -->
+    <div class="demo-banner">
+      🎯 DEMO — CurtainBiz Manager
+      <span
+        >· Data contoh untuk keperluan portofolio · Dibuat oleh Raffi
+        Sirojudin</span
+      >
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">🪟</span>
+        <div>
+          <div class="brand-name">CurtainBiz</div>
+          <div class="brand-sub">Business Manager</div>
+        </div>
+      </div>
+      <nav class="sidenav">
+        <button
+          class="nav-btn active"
+          data-page="dashboard"
+          onclick="go('dashboard')"
+        >
+          <span class="ni">🏠</span>Dasbor
+        </button>
+        <button class="nav-btn" data-page="orders" onclick="go('orders')">
+          <span class="ni">🛒</span>Pesanan
+        </button>
+        <button class="nav-btn" data-page="inventory" onclick="go('inventory')">
+          <span class="ni">📦</span>Inventori<span
+            class="nbadge"
+            id="nb-inv"
+          ></span>
+        </button>
+        <button class="nav-btn" data-page="finance" onclick="go('finance')">
+          <span class="ni">💰</span>Keuangan
+        </button>
+        <button class="nav-btn" data-page="customers" onclick="go('customers')">
+          <span class="ni">👥</span>Pelanggan
+        </button>
+        <button class="nav-btn" data-page="analytics" onclick="go('analytics')">
+          <span class="ni">📈</span>Statistik
+        </button>
+      </nav>
+      <div class="side-foot">
+        <div class="side-note">
+          ✨ Versi Demo · Data tidak tersimpan · Untuk portofolio
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <main class="main">
+      <section id="page-dashboard" class="page active">
+        <div class="ph">
+          <h1>Selamat Datang 👋</h1>
+          <p>Ringkasan bisnis curtain — April 2026</p>
+        </div>
+        <div class="kgrid" id="kpi-dash"></div>
+        <div id="alert-dash"></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-title">Tren Pemasukan & Pengeluaran (14 Hari)</div>
+            <div class="chart-wrap"><canvas id="c-revenue"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Channel Penjualan</div>
+            <div class="chart-wrap"><canvas id="c-channel"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pesanan Terbaru</div>
+          <table class="dtable" id="t-recent"></table>
+        </div>
+      </section>
+
+      <section id="page-orders" class="page">
+        <div class="ph ph-row">
+          <div>
+            <h1>Manajemen Pesanan</h1>
+            <p id="p-orders-ct"></p>
+          </div>
+          <button class="btn btn-p" onclick="openM('m-order')">
+            ➕ Pesanan Baru
+          </button>
+        </div>
+        <div class="fbar">
+          <input
+            class="sinput"
+            id="s-orders"
+            placeholder="🔍  Cari pesanan / pelanggan..."
+            oninput="renderOrders()"
+          />
+          <div class="sfilters" id="sf-orders"></div>
+        </div>
+        <div class="card" style="padding: 0; overflow: hidden">
+          <table class="dtable" id="t-orders"></table>
+        </div>
+      </section>
+
+      <section id="page-inventory" class="page">
+        <div class="ph ph-row">
+          <div>
+            <h1>Inventori Stok</h1>
+            <p id="p-inv-ct"></p>
+          </div>
+          <button class="btn btn-p" onclick="openM('m-item')">
+            ➕ Tambah Item
+          </button>
+        </div>
+        <div id="alert-inv"></div>
+        <div id="inv-body"></div>
+      </section>
+
+      <section id="page-finance" class="page">
+        <div class="ph"><h1>Keuangan</h1></div>
+        <div class="kgrid" id="kpi-fin"></div>
+        <div class="tbar" style="margin-top: 4px">
+          <button class="tbtn active" onclick="switchTab(this, 'tab-trx')">
+            📋 Transaksi
+          </button>
+          <button class="tbtn" onclick="switchTab(this, 'tab-report')">
+            📊 Laporan L/R
+          </button>
+          <button class="tbtn" onclick="switchTab(this, 'tab-hpp')">
+            🧮 Kalkulator HPP
+          </button>
+        </div>
+        <div id="tab-trx" class="tcontent active">
+          <div class="sarow">
+            <button class="btn btn-p" onclick="openM('m-trx')">
+              ➕ Tambah Transaksi
+            </button>
+          </div>
+          <div class="card" style="padding: 0; overflow: hidden">
+            <table class="dtable" id="t-trx"></table>
+          </div>
+        </div>
+        <div id="tab-report" class="tcontent">
+          <div class="g2" style="margin-top: 4px">
+            <div class="card" id="lr-box"></div>
+            <div class="card">
+              <div class="card-title">Pengeluaran per Kategori</div>
+              <div class="chart-wrap"><canvas id="c-exp"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div id="tab-hpp" class="tcontent">
+          <div class="g2" style="margin-top: 4px">
+            <div class="card">
+              <div class="card-title">🧮 Kalkulator HPP Gorden</div>
+              <p style="font-size: 12px; color: #7a8b96; margin-bottom: 14px">
+                Masukkan biaya untuk 1 pesanan / panel
+              </p>
+              <div class="fgroup">
+                <label>Biaya Kain (Rp)</label
+                ><input
+                  type="number"
+                  id="h-kain"
+                  placeholder="350000"
+                  oninput="calcHPP()"
+                />
+              </div>
+              <div class="fgroup">
+                <label>Rel & Aksesoris (Rp)</label
+                ><input
+                  type="number"
+                  id="h-rel"
+                  placeholder="75000"
+                  oninput="calcHPP()"
+                />
+              </div>
+              <div class="fgroup">
+                <label>Aksesoris Lain (Rp)</label
+                ><input
+                  type="number"
+                  id="h-aks"
+                  placeholder="25000"
+                  oninput="calcHPP()"
+                />
+              </div>
+              <div class="fgroup">
+                <label>Upah Jahit (Rp)</label
+                ><input
+                  type="number"
+                  id="h-jahit"
+                  placeholder="100000"
+                  oninput="calcHPP()"
+                />
+              </div>
+              <div class="fgroup">
+                <label>Overhead (Rp)</label
+                ><input
+                  type="number"
+                  id="h-over"
+                  placeholder="30000"
+                  oninput="calcHPP()"
+                />
+              </div>
+            </div>
+            <div class="card" id="hpp-out">
+              <div
+                style="
+                  text-align: center;
+                  padding: 60px 0;
+                  color: #7a8b96;
+                  font-size: 13px;
+                "
+              >
+                Isi form di sebelah kiri untuk melihat hasil
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-customers" class="page">
+        <div class="ph">
+          <h1>Data Pelanggan</h1>
+          <p id="p-cust-ct"></p>
+        </div>
+        <input
+          class="sinput"
+          id="s-cust"
+          placeholder="🔍  Cari nama / kota..."
+          oninput="renderCust()"
+          style="max-width: 360px; margin-bottom: 18px; display: block"
+        />
+        <div class="cgrid" id="cust-grid"></div>
+      </section>
+
+      <section id="page-analytics" class="page">
+        <div class="ph"><h1>Statistik & Analitik</h1></div>
+        <div class="kgrid" id="kpi-ana"></div>
+        <div class="g2" style="margin-top: 20px">
+          <div class="card">
+            <div class="card-title">Pesanan per Channel</div>
+            <div class="chart-wrap"><canvas id="c-ch-bar"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Distribusi Status Pesanan</div>
+            <div class="chart-wrap"><canvas id="c-status"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pemasukan vs Pengeluaran Harian</div>
+          <div class="chart-wrap" style="height: 180px">
+            <canvas id="c-cmp"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- MODAL PESANAN -->
+    <div class="moverlay" id="m-order" onclick="closeOut(event, 'm-order')">
+      <div class="modal">
+        <div class="mhead">
+          <h3>Pesanan Baru</h3>
+          <button onclick="closeM('m-order')">✕</button>
+        </div>
+        <div class="fgroup">
+          <label>Nama Pelanggan *</label
+          ><input id="o-cust" placeholder="cth. Budi Santoso" />
+        </div>
+        <div class="fgroup">
+          <label>Channel</label
+          ><select id="o-ch">
+            <option>WhatsApp</option>
+            <option>Tokopedia</option>
+            <option>Shopee</option>
+            <option>Instagram</option>
+            <option>TikTok Shop</option>
+            <option>Offline</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Detail Pesanan *</label
+          ><input
+            id="o-items"
+            placeholder="cth. Gorden Blackout 2.5m×2.8m, 2 panel"
+          />
+        </div>
+        <div class="g2">
+          <div class="fgroup">
+            <label>Total Harga (Rp)</label
+            ><input type="number" id="o-total" placeholder="1800000" />
+          </div>
+          <div class="fgroup">
+            <label>DP Dibayar (Rp)</label
+            ><input type="number" id="o-dp" placeholder="900000" />
+          </div>
+        </div>
+        <div class="fgroup">
+          <label>Deadline</label><input type="date" id="o-dl" />
+        </div>
+        <div class="mfoot">
+          <button class="btn btn-g" onclick="closeM('m-order')">Batal</button
+          ><button class="btn btn-p" onclick="addOrder()">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ITEM -->
+    <div class="moverlay" id="m-item" onclick="closeOut(event, 'm-item')">
+      <div class="modal">
+        <div class="mhead">
+          <h3>Tambah Item Stok</h3>
+          <button onclick="closeM('m-item')">✕</button>
+        </div>
+        <div class="fgroup">
+          <label>Nama Item *</label
+          ><input id="i-name" placeholder="cth. Kain Blackout Putih" />
+        </div>
+        <div class="g2">
+          <div class="fgroup">
+            <label>Kategori</label
+            ><select id="i-cat">
+              <option>Kain</option>
+              <option>Rel & Aksesoris</option>
+              <option>Bahan Jahit</option>
+              <option>Produk Jadi</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <label>Satuan</label
+            ><input id="i-unit" placeholder="meter / pcs / gulung" />
+          </div>
+        </div>
+        <div class="g3">
+          <div class="fgroup">
+            <label>Stok Awal</label
+            ><input type="number" id="i-stk" placeholder="0" />
+          </div>
+          <div class="fgroup">
+            <label>Stok Min.</label
+            ><input type="number" id="i-min" placeholder="10" />
+          </div>
+          <div class="fgroup">
+            <label>Harga Beli</label
+            ><input type="number" id="i-price" placeholder="35000" />
+          </div>
+        </div>
+        <div class="mfoot">
+          <button class="btn btn-g" onclick="closeM('m-item')">Batal</button
+          ><button class="btn btn-p" onclick="addItem()">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL TRANSAKSI -->
+    <div class="moverlay" id="m-trx" onclick="closeOut(event, 'm-trx')">
+      <div class="modal">
+        <div class="mhead">
+          <h3>Tambah Transaksi</h3>
+          <button onclick="closeM('m-trx')">✕</button>
+        </div>
+        <div class="fgroup">
+          <label>Tipe</label
+          ><select id="t-type">
+            <option value="income">▲ Pemasukan</option>
+            <option value="expense">▼ Pengeluaran</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Kategori</label
+          ><input id="t-cat" placeholder="cth. Penjualan / Bahan Baku" />
+        </div>
+        <div class="fgroup">
+          <label>Jumlah (Rp) *</label
+          ><input type="number" id="t-amt" placeholder="500000" />
+        </div>
+        <div class="fgroup">
+          <label>Keterangan *</label
+          ><input id="t-desc" placeholder="cth. Beli kain blackout 10m" />
+        </div>
+        <div class="fgroup">
+          <label>Tanggal</label><input type="date" id="t-date" />
+        </div>
+        <div class="mfoot">
+          <button class="btn btn-g" onclick="closeM('m-trx')">Batal</button
+          ><button class="btn btn-p" onclick="addTrx()">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ═══════════ DATA DEMO ═══════════
+      let orders = [
+        {
+          id: 1,
+          code: "ORD-001",
+          customer: "Siti Rahayu",
+          channel: "Tokopedia",
+          status: "Selesai",
+          total: 1800000,
+          dp: 1800000,
+          deadline: "2026-04-05",
+          items: "Gorden Blackout 2.5m×2.8m, 2 panel",
+        },
+        {
+          id: 2,
+          code: "ORD-002",
+          customer: "Budi Santoso",
+          channel: "WhatsApp",
+          status: "Dijahit",
+          total: 2400000,
+          dp: 1200000,
+          deadline: "2026-04-15",
+          items: "Vitrase Putih 3m×2.5m, 4 panel",
+        },
+        {
+          id: 3,
+          code: "ORD-003",
+          customer: "Ahmad Fauzi",
+          channel: "Instagram",
+          status: "Diproses",
+          total: 3600000,
+          dp: 1800000,
+          deadline: "2026-04-18",
+          items: "Gorden Sheer + Blackout kombinasi",
+        },
+        {
+          id: 4,
+          code: "ORD-004",
+          customer: "Dewi Lestari",
+          channel: "Shopee",
+          status: "Baru",
+          total: 1200000,
+          dp: 600000,
+          deadline: "2026-04-20",
+          items: "Gorden Polos Beige 2m×2.5m, 2 panel",
+        },
+        {
+          id: 5,
+          code: "ORD-005",
+          customer: "Rina Wijaya",
+          channel: "TikTok Shop",
+          status: "Siap Kirim",
+          total: 2100000,
+          dp: 2100000,
+          deadline: "2026-04-10",
+          items: "Roller Blind 1.5m×2m, 3 unit",
+        },
+        {
+          id: 6,
+          code: "ORD-006",
+          customer: "Hendra G.",
+          channel: "WhatsApp",
+          status: "Selesai",
+          total: 4200000,
+          dp: 4200000,
+          deadline: "2026-04-02",
+          items: "Gorden Motif Bunga, 6 panel",
+        },
+        {
+          id: 7,
+          code: "ORD-007",
+          customer: "Maya Putri",
+          channel: "TikTok Shop",
+          status: "Dibatalkan",
+          total: 900000,
+          dp: 0,
+          deadline: "2026-04-12",
+          items: "Gorden Minimalis Abu 2m×2.2m",
+        },
+        {
+          id: 8,
+          code: "ORD-008",
+          customer: "Dian Kusuma",
+          channel: "Instagram",
+          status: "Baru",
+          total: 1800000,
+          dp: 900000,
+          deadline: "2026-04-22",
+          items: "Tirai Bambu 1.2m×2m, 2 unit",
+        },
+        {
+          id: 9,
+          code: "ORD-009",
+          customer: "Reza Pratama",
+          channel: "TikTok Shop",
+          status: "Selesai",
+          total: 3200000,
+          dp: 3200000,
+          deadline: "2026-04-08",
+          items: "Gorden Blackout Premium 3m×2.8m, 4 panel",
+        },
+        {
+          id: 10,
+          code: "ORD-010",
+          customer: "Indah Permata",
+          channel: "Offline",
+          status: "Dijahit",
+          total: 2800000,
+          dp: 1400000,
+          deadline: "2026-04-25",
+          items: "Gorden Gradasi Biru 2.5m×2.6m, 3 panel",
+        },
+      ];
+      let inventory = [
+        {
+          id: 1,
+          name: "Kain Blackout Abu-abu",
+          cat: "Kain",
+          unit: "meter",
+          stock: 45,
+          min: 20,
+          price: 35000,
+        },
+        {
+          id: 2,
+          name: "Kain Blackout Putih",
+          cat: "Kain",
+          unit: "meter",
+          stock: 8,
+          min: 20,
+          price: 37000,
+        },
+        {
+          id: 3,
+          name: "Kain Vitrase/Sheer",
+          cat: "Kain",
+          unit: "meter",
+          stock: 62,
+          min: 25,
+          price: 22000,
+        },
+        {
+          id: 4,
+          name: "Kain Velvet Navy",
+          cat: "Kain",
+          unit: "meter",
+          stock: 12,
+          min: 15,
+          price: 85000,
+        },
+        {
+          id: 5,
+          name: "Kain Polos Beige",
+          cat: "Kain",
+          unit: "meter",
+          stock: 30,
+          min: 20,
+          price: 42000,
+        },
+        {
+          id: 6,
+          name: "Rel Aluminium 2m",
+          cat: "Rel & Aksesoris",
+          unit: "pcs",
+          stock: 25,
+          min: 10,
+          price: 45000,
+        },
+        {
+          id: 7,
+          name: "Rel Aluminium 3m",
+          cat: "Rel & Aksesoris",
+          unit: "pcs",
+          stock: 4,
+          min: 8,
+          price: 65000,
+        },
+        {
+          id: 8,
+          name: "Kait Gorden",
+          cat: "Rel & Aksesoris",
+          unit: "pak",
+          stock: 50,
+          min: 20,
+          price: 8000,
+        },
+        {
+          id: 9,
+          name: "Pita Pleat Tape",
+          cat: "Bahan Jahit",
+          unit: "meter",
+          stock: 3,
+          min: 15,
+          price: 12000,
+        },
+        {
+          id: 10,
+          name: "Benang Jahit",
+          cat: "Bahan Jahit",
+          unit: "gulung",
+          stock: 20,
+          min: 10,
+          price: 5000,
+        },
+      ];
+      let transactions = [
+        {
+          id: 1,
+          type: "income",
+          cat: "Penjualan",
+          amount: 1800000,
+          desc: "Pelunasan ORD-001",
+          date: "2026-04-05",
+        },
+        {
+          id: 2,
+          type: "expense",
+          cat: "Bahan Baku",
+          amount: 420000,
+          desc: "Beli kain blackout 12m",
+          date: "2026-04-05",
+        },
+        {
+          id: 3,
+          type: "income",
+          cat: "DP",
+          amount: 1200000,
+          desc: "DP ORD-002 Budi Santoso",
+          date: "2026-04-01",
+        },
+        {
+          id: 4,
+          type: "expense",
+          cat: "Operasional",
+          amount: 150000,
+          desc: "Listrik & air Maret",
+          date: "2026-04-01",
+        },
+        {
+          id: 5,
+          type: "income",
+          cat: "DP",
+          amount: 1800000,
+          desc: "DP ORD-003 Ahmad Fauzi",
+          date: "2026-04-03",
+        },
+        {
+          id: 6,
+          type: "expense",
+          cat: "Bahan Baku",
+          amount: 680000,
+          desc: "Beli kain velvet 8m",
+          date: "2026-04-04",
+        },
+        {
+          id: 7,
+          type: "income",
+          cat: "Penjualan",
+          amount: 4200000,
+          desc: "Pelunasan ORD-006",
+          date: "2026-04-02",
+        },
+        {
+          id: 8,
+          type: "expense",
+          cat: "Tenaga Kerja",
+          amount: 800000,
+          desc: "Upah jahit minggu ke-1",
+          date: "2026-04-07",
+        },
+        {
+          id: 9,
+          type: "income",
+          cat: "DP",
+          amount: 600000,
+          desc: "DP ORD-004 Dewi Lestari",
+          date: "2026-04-08",
+        },
+        {
+          id: 10,
+          type: "income",
+          cat: "Penjualan",
+          amount: 3200000,
+          desc: "Pelunasan ORD-009 Reza",
+          date: "2026-04-08",
+        },
+        {
+          id: 11,
+          type: "expense",
+          cat: "Marketing",
+          amount: 200000,
+          desc: "Iklan TikTok & Instagram",
+          date: "2026-04-09",
+        },
+        {
+          id: 12,
+          type: "income",
+          cat: "DP",
+          amount: 900000,
+          desc: "DP ORD-008 Dian Kusuma",
+          date: "2026-04-09",
+        },
+        {
+          id: 13,
+          type: "expense",
+          cat: "Pengiriman",
+          amount: 85000,
+          desc: "Ongkir ORD-009",
+          date: "2026-04-08",
+        },
+        {
+          id: 14,
+          type: "income",
+          cat: "DP",
+          amount: 1400000,
+          desc: "DP ORD-010 Indah Permata",
+          date: "2026-04-10",
+        },
+      ];
+      let customers = [
+        {
+          id: 1,
+          name: "Ahmad Fauzi",
+          phone: "084567890123",
+          city: "Depok",
+          orders: 7,
+          total: 12300000,
+        },
+        {
+          id: 2,
+          name: "Reza Pratama",
+          phone: "089012345678",
+          city: "Jakarta",
+          orders: 6,
+          total: 10800000,
+        },
+        {
+          id: 3,
+          name: "Budi Santoso",
+          phone: "082345678901",
+          city: "Bekasi",
+          orders: 5,
+          total: 8750000,
+        },
+        {
+          id: 4,
+          name: "Hendra G.",
+          phone: "086789012345",
+          city: "Jakarta",
+          orders: 4,
+          total: 6800000,
+        },
+        {
+          id: 5,
+          name: "Indah Permata",
+          phone: "081987654321",
+          city: "Surabaya",
+          orders: 3,
+          total: 5600000,
+        },
+        {
+          id: 6,
+          name: "Rina Wijaya",
+          phone: "085678901234",
+          city: "Bogor",
+          orders: 2,
+          total: 3400000,
+        },
+        {
+          id: 7,
+          name: "Siti Rahayu",
+          phone: "081234567890",
+          city: "Jakarta",
+          orders: 3,
+          total: 4500000,
+        },
+        {
+          id: 8,
+          name: "Dewi Lestari",
+          phone: "083456789012",
+          city: "Tangerang",
+          orders: 1,
+          total: 1200000,
+        },
+        {
+          id: 9,
+          name: "Dian Kusuma",
+          phone: "088901234567",
+          city: "Surabaya",
+          orders: 1,
+          total: 1800000,
+        },
+      ];
+      const REV = {
+        lbl: [
+          "29/3",
+          "30/3",
+          "31/3",
+          "1/4",
+          "2/4",
+          "3/4",
+          "4/4",
+          "5/4",
+          "6/4",
+          "7/4",
+          "8/4",
+          "9/4",
+          "10/4",
+          "11/4",
+        ],
+        inc: [
+          1200000, 800000, 2800000, 1200000, 4200000, 1800000, 1600000, 1800000,
+          5000000, 0, 600000, 900000, 1400000, 2100000,
+        ],
+        exp: [
+          350000, 120000, 500000, 150000, 200000, 680000, 680000, 420000, 85000,
+          1040000, 0, 200000, 150000, 300000,
+        ],
+      };
+      const CH_COLORS = {
+        WhatsApp: "#25D366",
+        Tokopedia: "#00AA5B",
+        Instagram: "#E1306C",
+        Shopee: "#EE4D2D",
+        "TikTok Shop": "#010101",
+        Offline: "#C4973A",
+      };
+      const STATUSES = [
+        "Baru",
+        "Diproses",
+        "Dijahit",
+        "Siap Kirim",
+        "Selesai",
+        "Dibatalkan",
+      ];
+      let orderFilt = "Semua",
+        CHS = {};
+
+      const fmt = (n) => "Rp " + Number(n).toLocaleString("id-ID");
+      const fmts = (n) =>
+        n >= 1000000
+          ? "Rp " + (n / 1000000).toFixed(1) + " jt"
+          : n >= 1000
+            ? "Rp " + (n / 1000).toFixed(0) + " rb"
+            : "Rp " + n;
+      const bclass = {
+        Baru: "b-baru",
+        Diproses: "b-diproses",
+        Dijahit: "b-dijahit",
+        "Siap Kirim": "b-siap",
+        Selesai: "b-selesai",
+        Dibatalkan: "b-batal",
+      };
+      const sbg = {
+        Baru: "#EBF5FB",
+        Diproses: "#FEF5E7",
+        Dijahit: "#F0EBFF",
+        "Siap Kirim": "#E0F4FF",
+        Selesai: "#EAFAF1",
+        Dibatalkan: "#FDEDEC",
+      };
+      const stxt = {
+        Baru: "#2471A3",
+        Diproses: "#E67E22",
+        Dijahit: "#7B3FE4",
+        "Siap Kirim": "#0A84C0",
+        Selesai: "#27AE60",
+        Dibatalkan: "#C0392B",
+      };
+      function kcard(l, v, s, c, i) {
+        return `<div class="kcard"><div><div class="klabel">${l}</div><div class="kval">${v}</div>${s ? `<div class="ksub">${s}</div>` : ""}</div><div class="kicon" style="background:${c}22">${i}</div></div>`;
+      }
+      function dChart(id) {
+        if (CHS[id]) {
+          CHS[id].destroy();
+          delete CHS[id];
+        }
+      }
+
+      function go(page) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("page-" + page).classList.add("active");
+        document
+          .querySelector('[data-page="' + page + '"]')
+          .classList.add("active");
+        if (page === "dashboard") renderDash();
+        if (page === "orders") renderOrders();
+        if (page === "inventory") renderInv();
+        if (page === "finance") renderFin();
+        if (page === "customers") renderCust();
+        if (page === "analytics") renderAna();
+      }
+      function openM(id) {
+        document.getElementById(id).classList.add("open");
+      }
+      function closeM(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+      function closeOut(e, id) {
+        if (e.target.id === id) closeM(id);
+      }
+      function switchTab(btn, tab) {
+        document
+          .querySelectorAll(".tbtn")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelectorAll(".tcontent")
+          .forEach((c) => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(tab).classList.add("active");
+        if (tab === "tab-report") {
+          renderLR();
+          setTimeout(renderExpChart, 60);
+        }
+      }
+      function updateBadges() {
+        var low = inventory.filter((i) => i.stock <= i.min).length;
+        var nb = document.getElementById("nb-inv");
+        if (low > 0) {
+          nb.textContent = low;
+          nb.classList.add("show");
+        } else nb.classList.remove("show");
+      }
+
+      function renderDash() {
+        var inc = transactions
+          .filter((t) => t.type === "income")
+          .reduce((s, t) => s + t.amount, 0);
+        var exp = transactions
+          .filter((t) => t.type === "expense")
+          .reduce((s, t) => s + t.amount, 0);
+        var active = orders.filter(
+          (o) => !["Selesai", "Dibatalkan"].includes(o.status),
+        ).length;
+        var done = orders.filter((o) => o.status === "Selesai").length;
+        var low = inventory.filter((i) => i.stock <= i.min);
+        document.getElementById("kpi-dash").innerHTML =
+          kcard(
+            "Total Pemasukan",
+            fmts(inc),
+            "Bulan April 2026",
+            "#27AE60",
+            "💵",
+          ) +
+          kcard(
+            "Laba Bersih",
+            fmts(inc - exp),
+            "Pengeluaran: " + fmts(exp),
+            "#C4973A",
+            "📈",
+          ) +
+          kcard("Pesanan Aktif", active, "Sedang berjalan", "#2471A3", "🛒") +
+          kcard("Pesanan Selesai", done, "Bulan ini", "#27AE60", "✅");
+        document.getElementById("alert-dash").innerHTML = low.length
+          ? '<div class="alert warn"><span class="alert-icon">⚠️</span><div><div class="alert-title">Stok Hampir Habis!</div><div class="alert-body">' +
+            low
+              .map((i) => i.name + " (" + i.stock + " " + i.unit + ")")
+              .join(" • ") +
+            "</div></div></div>"
+          : "";
+        document.getElementById("t-recent").innerHTML =
+          "<thead><tr><th>Kode</th><th>Pelanggan</th><th>Channel</th><th>Total</th><th>Status</th></tr></thead><tbody>" +
+          orders
+            .slice(0, 6)
+            .map(
+              (o) =>
+                '<tr><td class="tc">' +
+                o.code +
+                '</td><td class="tm">' +
+                o.customer +
+                '</td><td class="tx">' +
+                o.channel +
+                '</td><td style="font-weight:600">' +
+                fmts(o.total) +
+                '</td><td><span class="badge ' +
+                bclass[o.status] +
+                '">' +
+                o.status +
+                "</span></td></tr>",
+            )
+            .join("") +
+          "</tbody>";
+        updateBadges();
+        setTimeout(function () {
+          renderRevChart();
+          renderChPie();
+        }, 100);
+      }
+
+      function renderRevChart() {
+        dChart("rev");
+        var ctx = document.getElementById("c-revenue");
+        if (!ctx) return;
+        CHS["rev"] = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: REV.lbl,
+            datasets: [
+              {
+                label: "Pemasukan",
+                data: REV.inc,
+                borderColor: "#27AE60",
+                backgroundColor: "#27AE6015",
+                borderWidth: 2,
+                pointRadius: 3,
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: "Pengeluaran",
+                data: REV.exp,
+                borderColor: "#C0392B",
+                backgroundColor: "#C0392B15",
+                borderWidth: 2,
+                pointRadius: 3,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { boxWidth: 12 } } },
+            scales: {
+              x: {
+                ticks: { font: { size: 10 }, color: "#7A8B96" },
+                grid: { color: "#E5DDD0" },
+              },
+              y: {
+                ticks: {
+                  font: { size: 10 },
+                  color: "#7A8B96",
+                  callback: function (v) {
+                    return v >= 1000000 ? v / 1000000 + "jt" : v / 1000 + "rb";
+                  },
+                },
+                grid: { color: "#E5DDD0" },
+              },
+            },
+          },
+        });
+      }
+      function renderChPie() {
+        dChart("chpie");
+        var ctx = document.getElementById("c-channel");
+        if (!ctx) return;
+        var chMap = {};
+        orders.forEach((o) => {
+          chMap[o.channel] = (chMap[o.channel] || 0) + 1;
+        });
+        var labels = Object.keys(chMap);
+        CHS["chpie"] = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels,
+            datasets: [
+              {
+                data: labels.map((l) => chMap[l]),
+                backgroundColor: labels.map((l) => CH_COLORS[l] || "#888"),
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { font: { size: 11 }, boxWidth: 10, padding: 8 },
+              },
+            },
+          },
+        });
+      }
+
+      function renderOrders() {
+        var s = (document.getElementById("s-orders").value || "").toLowerCase();
+        var filt = orders.filter(
+          (o) =>
+            (orderFilt === "Semua" || o.status === orderFilt) &&
+            (o.customer.toLowerCase().includes(s) ||
+              o.code.toLowerCase().includes(s)),
+        );
+        document.getElementById("p-orders-ct").textContent =
+          orders.length + " total pesanan";
+        document.getElementById("sf-orders").innerHTML = ["Semua"]
+          .concat(STATUSES)
+          .map(
+            (st) =>
+              '<button class="fbtn ' +
+              (orderFilt === st ? "active" : "") +
+              '" onclick="setFilt(\'' +
+              st +
+              "')\">" +
+              st +
+              "</button>",
+          )
+          .join("");
+        document.getElementById("t-orders").innerHTML =
+          "<thead><tr><th>Kode</th><th>Pelanggan</th><th>Channel</th><th>Detail</th><th>Total / DP</th><th>Deadline</th><th>Status</th><th>Ubah</th></tr></thead><tbody>" +
+          (filt.length === 0
+            ? '<tr><td colspan="8" class="empty">Tidak ada pesanan ditemukan</td></tr>'
+            : filt
+                .map(
+                  (o) =>
+                    '<tr><td class="tc">' +
+                    o.code +
+                    '</td><td class="tm">' +
+                    o.customer +
+                    '</td><td class="tx">' +
+                    o.channel +
+                    '</td><td class="tx" style="max-width:130px">' +
+                    o.items.substring(0, 32) +
+                    '...</td><td><div style="font-weight:600">' +
+                    fmt(o.total) +
+                    '</div><div style="font-size:11px;color:' +
+                    (o.dp >= o.total ? "#27AE60" : "#7A8B96") +
+                    '">DP: ' +
+                    fmt(o.dp) +
+                    (o.dp >= o.total ? " ✓" : "") +
+                    ' </div></td><td class="tx">' +
+                    o.deadline +
+                    '</td><td><span class="badge ' +
+                    bclass[o.status] +
+                    '">' +
+                    o.status +
+                    '</span></td><td><select class="ssel" style="background:' +
+                    sbg[o.status] +
+                    ";color:" +
+                    stxt[o.status] +
+                    '" onchange="chStatus(' +
+                    o.id +
+                    ',this.value)">' +
+                    STATUSES.map(
+                      (st) =>
+                        "<option" +
+                        (o.status === st ? " selected" : "") +
+                        ">" +
+                        st +
+                        "</option>",
+                    ).join("") +
+                    "</select></td></tr>",
+                )
+                .join("")) +
+          "</tbody>";
+      }
+      function setFilt(s) {
+        orderFilt = s;
+        renderOrders();
+      }
+      function chStatus(id, s) {
+        orders = orders.map((o) =>
+          o.id === id ? Object.assign({}, o, { status: s }) : o,
+        );
+        renderOrders();
+        updateBadges();
+      }
+      function addOrder() {
+        var c = document.getElementById("o-cust").value.trim();
+        var it = document.getElementById("o-items").value.trim();
+        if (!c || !it) {
+          alert("Nama pelanggan dan detail pesanan wajib diisi!");
+          return;
+        }
+        orders.unshift({
+          id: Date.now(),
+          code: "ORD-" + String(orders.length + 1).padStart(3, "0"),
+          customer: c,
+          channel: document.getElementById("o-ch").value,
+          items: it,
+          total: Number(document.getElementById("o-total").value) || 0,
+          dp: Number(document.getElementById("o-dp").value) || 0,
+          deadline: document.getElementById("o-dl").value,
+          status: "Baru",
+        });
+        closeM("m-order");
+        ["o-cust", "o-items", "o-total", "o-dp", "o-dl"].forEach(function (id) {
+          document.getElementById(id).value = "";
+        });
+        renderOrders();
+      }
+
+      function renderInv() {
+        var low = inventory.filter((i) => i.stock <= i.min);
+        document.getElementById("p-inv-ct").textContent =
+          inventory.length + " item · " + low.length + " stok menipis";
+        document.getElementById("alert-inv").innerHTML = low.length
+          ? '<div class="alert danger"><span class="alert-icon">⚠️</span><div><div class="alert-title">Stok Menipis — Segera Restock!</div><div class="alert-body" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' +
+            low
+              .map(
+                (i) =>
+                  '<span class="badge b-batal">' +
+                  i.name +
+                  ": " +
+                  i.stock +
+                  " " +
+                  i.unit +
+                  "</span>",
+              )
+              .join("") +
+            "</div></div></div>"
+          : "";
+        var cats = [...new Set(inventory.map((i) => i.cat))];
+        document.getElementById("inv-body").innerHTML = cats
+          .map(
+            (cat) =>
+              '<div class="icat-label">' +
+              cat +
+              '</div><div class="card" style="padding:0;overflow:hidden;margin-bottom:0"><table class="dtable"><thead><tr><th>Nama Item</th><th>Stok</th><th>Min.</th><th>Harga Beli</th><th>Status</th><th>Aksi</th></tr></thead><tbody>' +
+              inventory
+                .filter((i) => i.cat === cat)
+                .map((i) => {
+                  var lw = i.stock <= i.min;
+                  return (
+                    '<tr style="background:' +
+                    (lw ? "#FFF5F5" : "transparent") +
+                    '"><td style="font-weight:500">' +
+                    i.name +
+                    '</td><td><span style="font-size:18px;font-weight:700;color:' +
+                    (lw ? "#C0392B" : "#1C2B35") +
+                    '">' +
+                    i.stock +
+                    '</span> <span class="tx">' +
+                    i.unit +
+                    '</span></td><td class="tx">' +
+                    i.min +
+                    " " +
+                    i.unit +
+                    "</td><td>" +
+                    fmt(i.price) +
+                    "/" +
+                    i.unit +
+                    '</td><td><span class="badge ' +
+                    (lw ? "b-tipis" : "b-aman") +
+                    '">' +
+                    (lw ? "⚠️ Menipis" : "✅ Aman") +
+                    '</span></td><td><div class="sacts"><button class="sbtn p" onclick="adjStk(' +
+                    i.id +
+                    ',1)">+</button><button class="sbtn m" onclick="adjStk(' +
+                    i.id +
+                    ',-1)">−</button><button class="sbtn d" onclick="delItem(' +
+                    i.id +
+                    ')">🗑️</button></div></td></tr>'
+                  );
+                })
+                .join("") +
+              "</tbody></table></div>",
+          )
+          .join("");
+        updateBadges();
+      }
+      function adjStk(id, d) {
+        inventory = inventory.map((i) =>
+          i.id === id
+            ? Object.assign({}, i, { stock: Math.max(0, i.stock + d) })
+            : i,
+        );
+        renderInv();
+      }
+      function delItem(id) {
+        if (confirm("Hapus item ini?")) {
+          inventory = inventory.filter((i) => i.id !== id);
+          renderInv();
+        }
+      }
+      function addItem() {
+        var n = document.getElementById("i-name").value.trim();
+        if (!n) {
+          alert("Nama item wajib diisi!");
+          return;
+        }
+        inventory.push({
+          id: Date.now(),
+          name: n,
+          cat: document.getElementById("i-cat").value,
+          unit: document.getElementById("i-unit").value || "pcs",
+          stock: Number(document.getElementById("i-stk").value) || 0,
+          min: Number(document.getElementById("i-min").value) || 10,
+          price: Number(document.getElementById("i-price").value) || 0,
+        });
+        closeM("m-item");
+        ["i-name", "i-unit", "i-stk", "i-min", "i-price"].forEach(
+          function (id) {
+            document.getElementById(id).value = "";
+          },
+        );
+        renderInv();
+      }
+
+      function renderFin() {
+        var inc = transactions
+          .filter((t) => t.type === "income")
+          .reduce((s, t) => s + t.amount, 0);
+        var exp = transactions
+          .filter((t) => t.type === "expense")
+          .reduce((s, t) => s + t.amount, 0);
+        document.getElementById("kpi-fin").innerHTML =
+          kcard("Total Pemasukan", fmts(inc), "", "#27AE60", "💵") +
+          kcard("Total Pengeluaran", fmts(exp), "", "#C0392B", "💸") +
+          kcard(
+            "Laba Bersih",
+            fmts(inc - exp),
+            inc - exp >= 0 ? "✅ Profit" : "❌ Rugi",
+            "#C4973A",
+            "📊",
+          );
+        document.getElementById("t-trx").innerHTML =
+          "<thead><tr><th>Tanggal</th><th>Tipe</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody>" +
+          transactions
+            .map(
+              (t) =>
+                '<tr><td class="tx">' +
+                t.date +
+                '</td><td><span class="badge ' +
+                (t.type === "income" ? "b-masuk" : "b-keluar") +
+                '">' +
+                (t.type === "income" ? "▲ Masuk" : "▼ Keluar") +
+                '</span></td><td class="tx">' +
+                t.cat +
+                "</td><td>" +
+                t.desc +
+                '</td><td class="' +
+                (t.type === "income" ? "tok" : "terr") +
+                '">' +
+                (t.type === "income" ? "+" : "-") +
+                fmt(t.amount) +
+                "</td></tr>",
+            )
+            .join("") +
+          "</tbody>";
+      }
+      function renderLR() {
+        var inc = transactions
+          .filter((t) => t.type === "income")
+          .reduce((s, t) => s + t.amount, 0);
+        var exp = transactions
+          .filter((t) => t.type === "expense")
+          .reduce((s, t) => s + t.amount, 0);
+        document.getElementById("lr-box").innerHTML =
+          '<div class="card-title">Laporan Laba/Rugi — April 2026</div><div class="lrrow"><span class="tx">Total Pendapatan</span><span class="tok">' +
+          fmt(inc) +
+          '</span></div><div class="lrrow"><span class="tx">Total Pengeluaran</span><span class="terr">-' +
+          fmt(exp) +
+          '</span></div><div class="lrrow lrtotal"><span>LABA BERSIH</span><span style="color:' +
+          (inc - exp >= 0 ? "#C4973A" : "#C0392B") +
+          '">' +
+          fmt(inc - exp) +
+          "</span></div>";
+      }
+      function renderExpChart() {
+        dChart("exp");
+        var ctx = document.getElementById("c-exp");
+        if (!ctx) return;
+        var ec = {};
+        transactions
+          .filter((t) => t.type === "expense")
+          .forEach((t) => {
+            ec[t.cat] = (ec[t.cat] || 0) + t.amount;
+          });
+        CHS["exp"] = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: Object.keys(ec),
+            datasets: [
+              {
+                label: "Pengeluaran",
+                data: Object.values(ec),
+                backgroundColor: "#C4973A88",
+                borderColor: "#C4973A",
+                borderWidth: 1,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 10 },
+                  color: "#7A8B96",
+                  callback: function (v) {
+                    return v >= 1000000 ? v / 1000000 + "jt" : v / 1000 + "rb";
+                  },
+                },
+              },
+              y: { ticks: { font: { size: 11 }, color: "#7A8B96" } },
+            },
+          },
+        });
+      }
+      function calcHPP() {
+        var vals = ["h-kain", "h-rel", "h-aks", "h-jahit", "h-over"].map(
+          (id) => Number(document.getElementById(id).value) || 0,
+        );
+        var total = vals.reduce((a, b) => a + b, 0);
+        if (!total) {
+          document.getElementById("hpp-out").innerHTML =
+            '<div style="text-align:center;padding:60px 0;color:#7A8B96;font-size:13px">Isi form di sebelah kiri untuk melihat hasil</div>';
+          return;
+        }
+        document.getElementById("hpp-out").innerHTML =
+          '<div class="card-title">Hasil Perhitungan HPP</div><div class="hbox"><div class="hlabel">Total HPP per Panel</div><div class="hval">' +
+          fmt(total) +
+          "</div></div>" +
+          [
+            [1.3, "Margin 30%", "Minimum"],
+            [1.5, "Margin 50%", "Disarankan"],
+            [2.0, "Margin 100%", "Premium"],
+          ]
+            .map(function (r) {
+              return (
+                '<div class="hcard"><div><div class="hml">' +
+                r[1] +
+                '</div><div class="hmv">' +
+                fmt(Math.round(total * r[0])) +
+                '</div></div><span class="htag">' +
+                r[2] +
+                "</span></div>"
+              );
+            })
+            .join("");
+      }
+      function addTrx() {
+        var a = Number(document.getElementById("t-amt").value);
+        var d = document.getElementById("t-desc").value.trim();
+        if (!a || !d) {
+          alert("Jumlah dan keterangan wajib diisi!");
+          return;
+        }
+        transactions.unshift({
+          id: Date.now(),
+          type: document.getElementById("t-type").value,
+          cat: document.getElementById("t-cat").value || "Lainnya",
+          amount: a,
+          desc: d,
+          date:
+            document.getElementById("t-date").value ||
+            new Date().toISOString().split("T")[0],
+        });
+        closeM("m-trx");
+        ["t-cat", "t-amt", "t-desc"].forEach(function (id) {
+          document.getElementById(id).value = "";
+        });
+        renderFin();
+      }
+
+      function renderCust() {
+        var s = (document.getElementById("s-cust").value || "").toLowerCase();
+        var filt = customers.filter(
+          (c) =>
+            c.name.toLowerCase().includes(s) ||
+            c.city.toLowerCase().includes(s),
+        );
+        document.getElementById("p-cust-ct").textContent =
+          customers.length + " pelanggan terdaftar";
+        function seg(t) {
+          return t >= 8000000
+            ? { cls: "seg-vip", lbl: "⭐ VIP" }
+            : t >= 3000000
+              ? { cls: "seg-reg", lbl: "🔵 Regular" }
+              : { cls: "seg-new", lbl: "🆕 Baru" };
+        }
+        document.getElementById("cust-grid").innerHTML = filt
+          .map((c) => {
+            var sg = seg(c.total);
+            return (
+              '<div class="ccard"><div class="ctop"><div class="cavatar">' +
+              c.name.charAt(0) +
+              '</div><span class="' +
+              sg.cls +
+              '">' +
+              sg.lbl +
+              '</span></div><div class="cname">' +
+              c.name +
+              '</div><div class="cinfo">📞 ' +
+              c.phone +
+              "<br>📍 " +
+              c.city +
+              '</div><div class="cstats"><div style="text-align:center"><div class="csv">' +
+              c.orders +
+              '</div><div class="csl">Pesanan</div></div><div style="text-align:center"><div class="csva">' +
+              fmts(c.total) +
+              '</div><div class="csl">Total Belanja</div></div></div></div>'
+            );
+          })
+          .join("");
+      }
+
+      function renderAna() {
+        var done = orders.filter((o) => o.status === "Selesai").length;
+        var cancel = orders.filter((o) => o.status === "Dibatalkan").length;
+        var valid = orders.filter((o) => o.status !== "Dibatalkan");
+        var avg = valid.length
+          ? Math.round(valid.reduce((s, o) => s + o.total, 0) / valid.length)
+          : 0;
+        document.getElementById("kpi-ana").innerHTML =
+          kcard(
+            "Tingkat Selesai",
+            Math.round((done / orders.length) * 100) + "%",
+            "Dari total pesanan",
+            "#27AE60",
+            "✅",
+          ) +
+          kcard(
+            "Tingkat Batal",
+            Math.round((cancel / orders.length) * 100) + "%",
+            "Dari total pesanan",
+            "#C0392B",
+            "❌",
+          ) +
+          kcard(
+            "Rata-rata Pesanan",
+            fmts(avg),
+            "Average Order Value",
+            "#C4973A",
+            "💰",
+          );
+        setTimeout(function () {
+          renderChBar();
+          renderStChart();
+          renderCmpChart();
+        }, 100);
+      }
+      function renderChBar() {
+        dChart("chbar");
+        var ctx = document.getElementById("c-ch-bar");
+        if (!ctx) return;
+        var chMap = {};
+        orders.forEach((o) => {
+          chMap[o.channel] = (chMap[o.channel] || 0) + 1;
+        });
+        var labels = Object.keys(chMap);
+        CHS["chbar"] = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Pesanan",
+                data: labels.map((l) => chMap[l]),
+                backgroundColor: labels.map((l) => CH_COLORS[l] || "#888"),
+                borderRadius: 7,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { font: { size: 11 } } },
+              y: { ticks: { font: { size: 10 } }, beginAtZero: true },
+            },
+          },
+        });
+      }
+      function renderStChart() {
+        dChart("st");
+        var ctx = document.getElementById("c-status");
+        if (!ctx) return;
+        var sc = STATUSES.map(
+          (s) => orders.filter((o) => o.status === s).length,
+        );
+        CHS["st"] = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: STATUSES,
+            datasets: [
+              {
+                data: sc,
+                backgroundColor: [
+                  "#2471A3",
+                  "#E67E22",
+                  "#7B3FE4",
+                  "#0A84C0",
+                  "#27AE60",
+                  "#C0392B",
+                ],
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "right",
+                labels: { font: { size: 11 }, boxWidth: 12 },
+              },
+            },
+          },
+        });
+      }
+      function renderCmpChart() {
+        dChart("cmp");
+        var ctx = document.getElementById("c-cmp");
+        if (!ctx) return;
+        CHS["cmp"] = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: REV.lbl,
+            datasets: [
+              {
+                label: "Pemasukan",
+                data: REV.inc,
+                backgroundColor: "#27AE6088",
+                borderColor: "#27AE60",
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+              {
+                label: "Pengeluaran",
+                data: REV.exp,
+                backgroundColor: "#C0392B88",
+                borderColor: "#C0392B",
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { boxWidth: 12 } } },
+            scales: {
+              x: { ticks: { font: { size: 10 }, color: "#7A8B96" } },
+              y: {
+                ticks: {
+                  font: { size: 10 },
+                  color: "#7A8B96",
+                  callback: function (v) {
+                    return v >= 1000000 ? v / 1000000 + "jt" : v / 1000 + "rb";
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("t-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("o-dl").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        renderDash();
+      });
+    </script>
+  </body>
+</html>
